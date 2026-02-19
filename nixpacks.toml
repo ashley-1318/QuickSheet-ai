@@ -8,5 +8,8 @@ cmds = [
     ". .venv/bin/activate && pip install -r requirements.txt"
 ]
 
+[phases.build]
+cmds = []  # Clear default build commands to prevent automatic "pip install"
+
 [start]
 cmd = ". .venv/bin/activate && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
