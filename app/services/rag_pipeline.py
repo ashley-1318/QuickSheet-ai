@@ -37,6 +37,7 @@ class RagPipeline:
         flashcards: bool,
         flashcard_count: int,
         fast_mode: bool = False,
+        mode_instructions: str = ""
     ) -> RagResponse:
         import time
         extraction_start = time.time()
@@ -74,21 +75,55 @@ class RagPipeline:
         context = "\n\n".join(doc.page_content for doc in retrieved_docs)
 
         clamped_count = max(5, min(10, flashcard_count))
-        flashcard_instruction = (
-            "- flashcards: array of objects with keys 'question' and 'answer'\n"
-            f"- generate {clamped_count} flashcards\n"
-            if flashcards
-            else ""
-        )
+        flashcard_rule = f"- Generate exactly {clamped_count} flashcards if requested." if flashcards else ""
 
-        # Optimized shorter prompt
-        # Optimized shorter prompt
         system_prompt = (
-            "Generate structured exam-ready cheat sheet strictly from provided context. "
-            "Return ONLY valid JSON with: title, one_line_summary, definitions, core_formulas, key_concepts. "
-            f"Include only non-empty fields. {flashcard_instruction}"
+            "You are an advanced academic structuring AI.\n\n"
+            "Generate a structured, exam-ready cheat sheet from the provided study material.\n\n"
+            "The output must adapt based on:\n\n"
+            "Revision Mode:\n"
+            "- Quick 1-Page -> Highly compressed, ultra concise\n"
+            "- Standard -> Balanced depth\n"
+            "- Deep Revision -> Technically detailed and research-level\n\n"
+            "Exam Mode:\n"
+            "- Semester Exam -> Concept clarity + definitions + examples\n"
+            "- Competitive Exam -> Shortcuts + tricks + high-yield facts\n"
+            "- Interview Prep -> Concept depth + why/how explanations + edge cases\n\n"
+            "-----------------------------------\n\n"
+            "STRICT RULES:\n"
+            "1. Maintain clean academic formatting.\n"
+            "2. Remove redundant text.\n"
+            "3. Fix corrupted characters and encoding issues.\n"
+            "4. Normalize formulas and mathematical symbols.\n"
+            "5. Avoid filler content.\n"
+            "6. Do NOT hallucinate missing data.\n"
+            "7. Use bullet points only.\n"
+            "8. Keep sections ordered.\n"
+            "9. Do not include citations or references.\n"
+            "10. Return valid JSON only.\n\n"
+            "-----------------------------------\n\n"
+            "OUTPUT STRUCTURE:\n"
+            "{\n"
+            "  \"title\": \"\",\n"
+            "  \"one_line_summary\": \"\",\n"
+            "  \"definitions\": [ { \"term\": \"\", \"definition\": \"\" } ],\n"
+            "  \"core_formulas\": [ { \"formula\": \"\", \"meaning\": \"\", \"when_to_use\": \"\" } ],\n"
+            "  \"key_concepts\": [ { \"concept\": \"\", \"explanation\": \"\", \"importance\": \"\" } ],\n"
+            "  \"diagrams\": [],\n"
+            "  \"comparison_table\": [],\n"
+            "  \"important_metrics\": [],\n"
+            "  \"mistakes_to_avoid\": [],\n"
+            "  \"shortcuts\": [],\n"
+            "  \"quick_revision_points\": [],\n"
+            "  \"flashcards\": [ { \"question\": \"\", \"answer\": \"\" } ]\n"
+            "}\n\n"
+            "-----------------------------------\n\n"
+            f"MODE ADAPTATION LOGIC:\n{mode_instructions}\n"
+            "-----------------------------------\n\n"
+            f"{flashcard_rule}\n"
+            "Now generate the cheat sheet from the following content:"
         )
-        user_prompt = f"Context:\n{context}\n\nGenerate cheat sheet."
+        user_prompt = f"{context}"
 
         llm_start = time.time()
         # Direct invocation to avoid LangChain prompt template parsing issues with braces
@@ -122,16 +157,41 @@ class RagPipeline:
                 flashcard_count=clamped_count,
                 processing_time_ms=int(extraction_time + embedding_time + retrieval_time + llm_time),
             )
+        def _fmt_def(item: dict | str) -> str:
+            if isinstance(item, dict): return f"**{item.get('term', '')}**: {item.get('definition', '')}"
+            return str(item)
+            
+        def _fmt_formula(item: dict | str) -> str:
+            if isinstance(item, dict):
+                return f"**{item.get('formula', '')}**\n*Meaning:* {item.get('meaning', '')}\n*Use:* {item.get('when_to_use', '')}"
+            return str(item)
+        
+        def _fmt_concept(item: dict | str) -> str:
+            if isinstance(item, dict):
+                return f"**{item.get('concept', '')}**: {item.get('explanation', '')}\n*Importance:* {item.get('importance', '')}"
+            return str(item)
+
+        raw_defs = parsed.get("definitions", [])
+        definitions = [_fmt_def(item) for item in raw_defs] if isinstance(raw_defs, list) else []
+        
+        raw_formulas = parsed.get("core_formulas", [])
+        core_formulas = [_fmt_formula(item) for item in raw_formulas] if isinstance(raw_formulas, list) else []
+        
+        raw_concepts = parsed.get("key_concepts", [])
+        key_concepts = [_fmt_concept(item) for item in raw_concepts] if isinstance(raw_concepts, list) else []
+
         response = RagResponse(
             title=str(parsed.get("title", "Cheat Sheet")),
             one_line_summary=str(parsed.get("one_line_summary", "")),
-            definitions=_normalize_list(parsed.get("definitions")),
-            core_formulas=_normalize_list(parsed.get("core_formulas")),
-            key_concepts=_normalize_list(parsed.get("key_concepts")),
+            definitions=definitions,
+            core_formulas=core_formulas,
+            key_concepts=key_concepts,
             diagrams=_normalize_list(parsed.get("diagrams")),
             comparison_table=_normalize_list(parsed.get("comparison_table")),
             important_metrics=_normalize_list(parsed.get("important_metrics")),
-            mistakes_to_avoid=_normalize_list(parsed.get("mistakes_to_avoid")),
+            mistakes_to_avoid=_normalize_list(parsed.get("common_mistakes") or parsed.get("mistakes_to_avoid")),
+            shortcuts=_normalize_list(parsed.get("shortcuts")),
+            quick_revision_points=_normalize_list(parsed.get("quick_revision_points") or parsed.get("exam_revision_points")),
             flashcards=_normalize_flashcards(parsed.get("flashcards")) if flashcards else [],
             original_words=_count_words(text),
             compressed_words=0,

@@ -4,6 +4,7 @@ from pydantic import BaseModel
 class ChatAskRequest(BaseModel):
     cheatsheet_id: str
     question: str
+    exam_mode: str = "Semester Exam"
 
 
 class ChatAskResponse(BaseModel):

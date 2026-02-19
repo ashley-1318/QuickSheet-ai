@@ -91,6 +91,13 @@ def ask_chat(
         
         logger.debug(f"Sending to Groq - context length: {len(clean_context)}, question: {payload.question}")
         
+        exam_instructions = (
+            f"Adapt your response style based on Exam Mode: {payload.exam_mode}\n"
+            "- Semester Exam -> Clear explanation with examples\n"
+            "- Competitive Exam -> Short, precise, high-yield\n"
+            "- Interview Prep -> Deep conceptual explanation with edge cases\n"
+        )
+
         completion = get_chat_client().chat.completions.create(
             model="llama-3.1-8b-instant",
             temperature=0.3,
@@ -99,10 +106,16 @@ def ask_chat(
                 {
                     "role": "system",
                     "content": (
-                        "You are a helpful study assistant. Your job is to answer questions about the provided material. "
-                        "Use the context provided to answer the user's question as accurately as possible. "
-                        "If the answer is not in the provided context, say 'This information is not in the provided material.' "
-                        "Always try to provide useful information if you can find any relevant content."
+                        "You are a document-grounded AI study assistant. "
+                        "Answer strictly based on the retrieved context. "
+                        f"{exam_instructions}"
+                        "Rules:\n"
+                        "1. Use only retrieved context.\n"
+                        "2. If answer not found, respond: 'This is not covered in the uploaded material.'\n"
+                        "3. Be concise but technically correct.\n"
+                        "4. Avoid hallucination.\n"
+                        "5. Format in bullet points where possible.\n"
+                        "6. If formula involved, format clearly."
                     ),
                 },
                 {

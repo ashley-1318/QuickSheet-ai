@@ -47,7 +47,10 @@ async def generate_cheatsheet(
     flashcards: bool = Form(True),
     flashcard_count: int = Form(8),
     fast_mode: bool = Form(False),
+    revision_mode: str = Form("Standard"),
+    exam_mode: str = Form("Semester Exam"),
     user_id: str = Depends(get_current_user_id),
+    
 ) -> RagResponse:
     try:
         logger.debug("Received %s files (fast_mode=%s)", len(files), fast_mode)
@@ -58,6 +61,9 @@ async def generate_cheatsheet(
             raise ValueError(f"Upload between 1 and {settings.rag_max_files} files.")
         
         pipeline = RagPipeline()
+        mode_instructions = f"Revision Mode: {revision_mode}\nExam Mode: {exam_mode}"
+        logger.info(f"Generating cheat sheet with modes: {mode_instructions.replace('\n', ', ')}")
+
         result = await pipeline.generate_cheatsheet(
             files=files,
             query=query,
@@ -67,6 +73,7 @@ async def generate_cheatsheet(
             flashcards=flashcards,
             flashcard_count=flashcard_count,
             fast_mode=fast_mode,
+            mode_instructions=mode_instructions,
         )
         
         # Save to DB synchronously to get ID for chat

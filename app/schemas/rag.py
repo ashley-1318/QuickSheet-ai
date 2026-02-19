@@ -17,6 +17,8 @@ class RagResponse(BaseModel):
     comparison_table: list[str]
     important_metrics: list[str]
     mistakes_to_avoid: list[str]
+    shortcuts: list[str] = []
+    quick_revision_points: list[str] = []
     flashcards: list[Flashcard]
     original_words: int
     compressed_words: int
