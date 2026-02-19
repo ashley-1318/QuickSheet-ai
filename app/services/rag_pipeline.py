@@ -75,7 +75,7 @@ class RagPipeline:
 
         clamped_count = max(5, min(10, flashcard_count))
         flashcard_instruction = (
-            "- flashcards: array of {question, answer}\n"
+            "- flashcards: array of {{question, answer}}\n"
             f"- generate {clamped_count} flashcards\n"
             if flashcards
             else ""
