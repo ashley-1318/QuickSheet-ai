@@ -1,0 +1,39 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Environment and local history
+.env
+.history/
+
+# Python caches and virtual env
+__pycache__/
+*.pyc
+.venv/
+
+# Vite build artifacts
+vite.config.ts.timestamp-*.mjs
+
+# Temporary files
+tmp_test.docx

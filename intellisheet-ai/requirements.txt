@@ -1,0 +1,16 @@
+FastAPI
+uvicorn
+groq
+pdfplumber
+python-docx
+python-pptx
+pydantic
+httpx
+python-dotenv
+loguru
+langchain
+langchain-community
+langchain-groq
+faiss-cpu
+sentence-transformers
+python-multipart

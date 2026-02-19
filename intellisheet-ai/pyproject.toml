@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "intellisheet-ai"
+version = "0.1.0"
+description = "An AI application for generating cheat sheets from documents."
+authors = ["Your Name <youremail@example.com>"]
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/yourusername/intellisheet-ai"
+repository = "https://github.com/yourusername/intellisheet-ai"
+keywords = ["AI", "FastAPI", "cheat sheet", "document processing"]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.95.0"
+uvicorn = "^0.22.0"
+groq-sdk = "^1.0.0"
+pdfplumber = "^0.7.0"
+python-docx = "^0.8.11"
+python-pptx = "^0.6.23"
+langchain = "^0.2.11"
+langchain-community = "^0.2.10"
+langchain-groq = "^0.1.5"
+faiss-cpu = "^1.8.0.post1"
+sentence-transformers = "^3.0.1"
+python-multipart = "^0.0.9"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
