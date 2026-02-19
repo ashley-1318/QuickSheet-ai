@@ -25,7 +25,7 @@ class EmbeddingService:
             return
         
         try:
-            logger.info(f"Initializing embeddings with model: {settings.rag_embedding_model}")ok doc
+            logger.info(f"Initializing embeddings with model: {settings.rag_embedding_model}")
             self._embeddings = HuggingFaceEmbeddings(
                 model_name=settings.rag_embedding_model,
                 encode_kwargs={"normalize_embeddings": True},
