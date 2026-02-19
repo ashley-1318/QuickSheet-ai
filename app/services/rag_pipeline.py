@@ -378,17 +378,13 @@ async def _generate_flashcards_with_llm(
     context: str,
     count: int,
 ) -> list[dict[str, str]]:
-    prompt = ChatPromptTemplate.from_messages(
-        [
-            (
-                "system",
-                "Return ONLY valid JSON with key 'flashcards'. Each flashcard must include "
-                "non-empty 'question' and 'answer'. Generate exactly {count} flashcards. "
-                "Use only the provided context.",
-            ),
-            ("user", "Context:\n{context}"),
-        ]
+    system_prompt = (
+        "Return ONLY valid JSON with key 'flashcards'. Each flashcard must include "
+        f"non-empty 'question' and 'answer'. Generate exactly {count} flashcards. "
+        "Use only the provided context."
     )
+    user_prompt = f"Context:\n{context}"
+
     try:
         llm = ChatGroq(
             api_key=settings.groq_api_key_cheatsheet,
@@ -398,10 +394,10 @@ async def _generate_flashcards_with_llm(
             model_kwargs={"response_format": {"type": "json_object"}},
         )
         response = llm.invoke(
-            prompt.format_messages(
-                context=_truncate_text(context, 6000),
-                count=count,
-            )
+            [
+                ("system", system_prompt),
+                ("user", user_prompt),
+            ]
         )
         parsed = _safe_parse_json(_normalize_content(response.content))
         if not parsed:
