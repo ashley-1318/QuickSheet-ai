@@ -28,11 +28,11 @@ app.include_router(rag_router)
 app.include_router(history_router)
 
 
-@app.get("/health")
+@app.api_route("/health", methods=["GET", "HEAD"])
 def health_check() -> dict:
     return {"status": "ok"}
 
 
-@app.get("/")
+@app.api_route("/", methods=["GET", "HEAD"])
 def read_root() -> dict:
     return {"message": "Welcome to QuickSheet AI API"}
