@@ -1,98 +1,116 @@
-# QuickSheet AI - Backend Setup Guide
+# QuickSheet AI - Backend Guide
+
+This guide covers the FastAPI backend for QuickSheet AI, including setup, environment variables, and deployment.
 
 ## Prerequisites
 
 - Python 3.8+
 - Node.js 16+
-- Groq API Key (get one at https://console.groq.com/keys)
+- Groq API keys (https://console.groq.com/keys)
 
 ## Setup
 
-### 1. Copy environment template
+1. Copy the environment template
+
 ```bash
 cp .env.example .env
 ```
 
-### 2. Add your Groq API Key to `.env`
-```
-GROQ_API_KEY=your_api_key_here
-```
+2. Add required keys to `.env`
 
-### 3. Install dependencies
 ```bash
-# Install Node dependencies (includes backend scripts)
-npm install
-
-# Backend dependencies are already in requirements.txt
-# They should be installed in your virtual environment
+GROQ_API_KEY_CHEATSHEET=your_key_here
+GROQ_API_KEY_CHAT=your_key_here
+SUPABASE_URL=your_supabase_url
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+GOOGLE_CLIENT_ID=your_google_oauth_client_id
 ```
 
-## Running the App
+3. Install dependencies
 
-### Option 1: Run both frontend + backend together (recommended)
+```bash
+npm install
+```
+
+## Running Locally
+
+**Option 1: Run frontend + backend together**
+
 ```bash
 npm run dev:all
 ```
+
 This starts:
-- **FastAPI backend** on `http://127.0.0.1:8000`
-- **Vite dev server** on `http://localhost:8080`
 
-### Option 2: Run individually
+- FastAPI backend: http://127.0.0.1:8000
+- Vite dev server: http://localhost:8080
+
+**Option 2: Run backend only**
+
 ```bash
-# Terminal 1: Backend API
 npm run dev:api
-
-# Terminal 2: Frontend (in another terminal)
-npm run dev
 ```
 
 ## Verify Setup
 
-1. **Backend is running:**
-   ```bash
-   curl http://127.0.0.1:8000/docs
-   ```
-   Should open Swagger UI.
-
-2. **Frontend is running:**
-   Open `http://localhost:8080` in your browser.
-
-3. **Upload a PDF/DOCX:**
-   - The frontend now sends files to the backend
-   - Backend extracts text and generates cheat sheets
-   - Results display in real-time
-
-## Troubleshooting
-
-### "Failed to fetch" error
-- Backend is not running. Check `npm run dev:api` output for errors.
-- Verify `GROQ_API_KEY` is set in your shell before starting the backend.
-
-### PDFs with scanned images (OCR needed)
-If your PDFs are scanned images, install OCR dependencies:
-```bash
-pip install pdf2image pytesseract
-```
-Also install Tesseract OCR: https://github.com/UB-Mannheim/tesseract/wiki
-
-### "No extractable text found"
-- The PDF is empty or has no selectable text
-- Try a different PDF with actual text content
+- Open Swagger UI: http://127.0.0.1:8000/docs
+- Make a test request to `/api/v1/rag/cheatsheet` using the frontend UI
 
 ## Environment Variables
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `GROQ_API_KEY` | Groq API key for LLM service | Yes |
-| `MAX_FILE_SIZE_MB` | Max upload size (default: 10) | No |
-| `MAX_PDF_PAGES` | Max pages per PDF (default: 20) | No |
-| `MAX_TOKENS_PER_CHUNK` | Tokens per API call (default: 3500) | No |
-| `MODEL_NAME` | LLM model to use (default: llama-3.1-8b-instant) | No |
+Required:
+
+- `GROQ_API_KEY_CHEATSHEET`
+- `GROQ_API_KEY_CHAT`
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+
+Auth (recommended):
+
+- `GOOGLE_CLIENT_ID`
+
+Dev auth (optional):
+
+- `ALLOW_DEV_AUTH` (set to `true` to bypass OAuth in dev)
+- `DEV_USER_ID` (default: `dev-user-test`)
+
+Tuning (optional):
+
+- `MODEL_NAME`
+- `LLM_TEMPERATURE`
+- `MAX_FILE_SIZE_MB`
+- `MAX_PDF_PAGES`
+- `MAX_TOKENS_PER_CHUNK`
+- `RAG_CHUNK_SIZE`
+- `RAG_CHUNK_OVERLAP`
+- `RAG_TOP_K`
+- `RAG_MAX_FILES`
+- `RAG_EMBEDDING_MODEL`
 
 ## API Endpoints
 
-- **POST /api/generate-cheatsheet** - Generate cheat sheet from file
-  - Accepts: PDF or DOCX files
-  - Returns: JSON with cheat sheet content, flashcards, stats
+- **POST /api/v1/rag/cheatsheet**
+  - Accepts multipart form data with `files[]` and options
+  - Returns structured cheat sheet JSON
 
-- **GET /docs** - Swagger UI documentation
+- **POST /api/v1/chat/ask**
+  - Ask follow-up questions using the extracted context
+
+- **GET /api/v1/history**
+  - Returns past generated cheat sheets
+
+- **GET /health**
+  - Health check endpoint
+
+## Deployment (Railway)
+
+- Uses `railway.json` with:
+  - `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+- Set the same environment variables in Railway
+- If you see 401 errors in production, verify `GOOGLE_CLIENT_ID` or set `ALLOW_DEV_AUTH=true`
+
+## Troubleshooting
+
+- **401 Unauthorized**: missing/invalid OAuth token or `ALLOW_DEV_AUTH` not set
+- **500 error on cheatsheet**: missing env vars, auth failure, or LLM errors
+- **No extractable text**: scanned PDFs need OCR (pdf2image + tesseract)

@@ -1,19 +1,37 @@
 # 📚 QuickSheet AI
 
+<<<<<<< HEAD
 <div align="center">
+=======
+QuickSheet AI turns study documents into structured cheat sheets and flashcards. Upload PDFs/DOCX/PPTX/TXT, choose options, and get a concise, exportable summary with a chat assistant.
+
+## What It Does
+
+- Converts documents into a structured cheat sheet with key concepts, formulas, and summaries.
+- Generates optional flashcards for quick revision.
+- Supports follow-up chat based on uploaded materials.
+>>>>>>> f77ca5e (fix: use configurable api base url)
 
 ![QuickSheet AI Banner](https://img.shields.io/badge/QuickSheet-AI-8B5CF6?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDJMMiA3TDEyIDEyTDIyIDdMMTIgMloiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CjxwYXRoIGQ9Ik0yIDEyTDEyIDE3TDIyIDEyIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8L3N2Zz4K)
 
 **Transform your study materials into AI-powered cheat sheets in seconds**
 
+<<<<<<< HEAD
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react)](https://reactjs.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104-009688?logo=fastapi)](https://fastapi.tiangolo.com/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript)](https://www.typescriptlang.org/)
 [![Groq](https://img.shields.io/badge/Powered%20by-Groq-FF6F00)](https://groq.com/)
+=======
+- React 18 + TypeScript + Vite
+- Tailwind CSS + shadcn-ui + Radix UI
+- Framer Motion, Lucide icons
+- Export: jsPDF + Markdown
+>>>>>>> f77ca5e (fix: use configurable api base url)
 
 [Demo](#-demo) • [Features](#-features) • [Quick Start](#-quick-start) • [Documentation](#-documentation) • [Contributing](#-contributing)
 
+<<<<<<< HEAD
 </div>
 
 ---
@@ -23,6 +41,19 @@
 QuickSheet AI is an intelligent study companion that transforms your documents into structured, exam-ready cheat sheets using advanced RAG (Retrieval Augmented Generation) technology. Upload your PDFs, DOCX, PPTX, or TXT files and get comprehensive summaries with key concepts, formulas, definitions, and practice flashcards.
 
 ### 🌟 Why QuickSheet AI?
+=======
+- FastAPI + Uvicorn
+- Groq LLM (default: `llama-3.1-8b-instant`)
+- LangChain + FAISS + Sentence-Transformers
+- pdfplumber, python-docx, python-pptx
+
+## How It Works
+
+1. Frontend uploads files and options to the RAG endpoint.
+2. Backend extracts text, chunks it, embeds, and retrieves top-K chunks.
+3. Groq generates structured JSON.
+4. Frontend renders the cheat sheet and flashcards; export is available.
+>>>>>>> f77ca5e (fix: use configurable api base url)
 
 - **⚡ Lightning Fast**: Generate comprehensive cheat sheets in under 30 seconds
 - **🎯 Exam-Focused**: Optimized for quick revision and exam preparation
@@ -36,9 +67,20 @@ QuickSheet AI is an intelligent study companion that transforms your documents i
 
 ## ✨ Features
 
+<<<<<<< HEAD
 <table>
 <tr>
 <td width="50%">
+=======
+- `files[]` (PDF, DOCX, PPTX, TXT)
+- `query` (optional)
+- `top_k` (optional)
+- `chunk_size` (optional)
+- `chunk_overlap` (optional)
+- `flashcards` (bool)
+- `flashcard_count` (5-10)
+- `fast_mode` (bool, optional)
+>>>>>>> f77ca5e (fix: use configurable api base url)
 
 ### 📄 Document Processing
 - ✅ Multi-format support (PDF, DOCX, PPTX, TXT)
@@ -47,6 +89,7 @@ QuickSheet AI is an intelligent study companion that transforms your documents i
 - ✅ Smart chunking with overlap
 - ✅ Semantic embeddings
 
+<<<<<<< HEAD
 </td>
 <td width="50%">
 
@@ -61,6 +104,24 @@ QuickSheet AI is an intelligent study companion that transforms your documents i
 </tr>
 <tr>
 <td width="50%">
+=======
+- `title`
+- `one_line_summary`
+- `definitions`
+- `core_formulas`
+- `key_concepts`
+- `diagrams`
+- `comparison_table`
+- `important_metrics`
+- `mistakes_to_avoid`
+- `flashcards`
+- `original_words`
+- `compressed_words`
+
+## Environment Variables
+
+Loaded from `.env` locally and from your hosting provider in production.
+>>>>>>> f77ca5e (fix: use configurable api base url)
 
 ### 🎴 Study Tools
 - ✅ Flashcard generation
@@ -69,6 +130,7 @@ QuickSheet AI is an intelligent study companion that transforms your documents i
 - ✅ Revision highlights
 - ✅ Mistake warnings
 
+<<<<<<< HEAD
 </td>
 <td width="50%">
 
@@ -82,6 +144,34 @@ QuickSheet AI is an intelligent study companion that transforms your documents i
 </td>
 </tr>
 </table>
+=======
+- `GROQ_API_KEY_CHEATSHEET`
+- `GROQ_API_KEY_CHAT`
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+
+Auth (recommended):
+
+- `GOOGLE_CLIENT_ID`
+
+Dev auth (optional):
+
+- `ALLOW_DEV_AUTH` (set to `true` to bypass OAuth in dev)
+- `DEV_USER_ID` (default: `dev-user-test`)
+
+Common tuning knobs (optional):
+
+- `MODEL_NAME`
+- `LLM_TEMPERATURE`
+- `MAX_FILE_SIZE_MB`
+- `MAX_PDF_PAGES`
+- `MAX_TOKENS_PER_CHUNK`
+- `RAG_CHUNK_SIZE`
+- `RAG_CHUNK_OVERLAP`
+- `RAG_TOP_K`
+- `RAG_MAX_FILES`
+- `RAG_EMBEDDING_MODEL`
+>>>>>>> f77ca5e (fix: use configurable api base url)
 
 ---
 
@@ -137,11 +227,17 @@ cd quicksheet-ai
 npm install
 ```
 
+<<<<<<< HEAD
 3. **Setup environment variables**
+=======
+2. Create `.env`
+
+>>>>>>> f77ca5e (fix: use configurable api base url)
 ```bash
 cp .env.example .env
 ```
 
+<<<<<<< HEAD
 Edit `.env` with your credentials:
 ```env
 # Required
@@ -156,6 +252,16 @@ GOOGLE_CLIENT_ID=your_google_client_id
 # Development (optional - bypasses auth)
 ALLOW_DEV_AUTH=true
 DEV_USER_ID=dev-user-test
+=======
+3. Add required keys
+
+```bash
+GROQ_API_KEY_CHEATSHEET=your_key_here
+GROQ_API_KEY_CHAT=your_key_here
+SUPABASE_URL=your_supabase_url
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+GOOGLE_CLIENT_ID=your_google_oauth_client_id
+>>>>>>> f77ca5e (fix: use configurable api base url)
 ```
 
 4. **Run the application**
@@ -170,12 +276,35 @@ This starts:
 5. **Open your browser**
 Navigate to http://localhost:8080 and start generating cheat sheets!
 
+<<<<<<< HEAD
 ---
 
 ## 📖 Documentation
+=======
+## Deployment (Vercel + Railway)
+
+**Frontend (Vercel)**
+
+- The frontend is a static Vite build.
+- `vercel.json` rewrites `/api/v1/*` to the Railway backend URL.
+
+**Backend (Railway)**
+
+- Uses `railway.json` with `uvicorn app.main:app --host 0.0.0.0 --port $PORT`.
+- Set the required environment variables in Railway.
+
+## Troubleshooting
+
+- **500 error on `/api/v1/rag/cheatsheet`**: missing OAuth token or `ALLOW_DEV_AUTH` not set.
+- **401 Unauthorized**: token missing/invalid. Add `GOOGLE_CLIENT_ID` or enable `ALLOW_DEV_AUTH`.
+- **Failed to fetch**: backend not reachable or wrong rewrite URL.
+- **No extractable text**: scanned PDFs need OCR.
+- **Slow first run**: model downloads on first use.
+>>>>>>> f77ca5e (fix: use configurable api base url)
 
 ### API Endpoints
 
+<<<<<<< HEAD
 #### Generate Cheat Sheet
 ```http
 POST /api/v1/rag/cheatsheet
@@ -689,3 +818,9 @@ If you found this helpful, please consider giving it a ⭐
 [Report Bug](https://github.com/yourusername/quicksheet-ai/issues) • [Request Feature](https://github.com/yourusername/quicksheet-ai/issues) • [Join Community](https://discord.gg/quicksheet)
 
 </div>
+=======
+- `app/` FastAPI backend
+- `src/` React frontend
+- `intellisheet-ai/` legacy backend
+- `public/` static assets
+>>>>>>> f77ca5e (fix: use configurable api base url)

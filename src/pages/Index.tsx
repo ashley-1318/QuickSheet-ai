@@ -77,6 +77,9 @@ const buildFallbackFlashcards = (data: CheatSheetData, maxCount: number): Flashc
   return cards;
 };
 
+const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL ?? "").replace(/\/$/, "");
+const apiUrl = (path: string) => `${apiBaseUrl}${path}`;
+
 const Index = () => {
   const [files, setFiles] = useState<File[]>([]);
   const [options, setOptions] = useState<OptionsState>({
@@ -114,7 +117,7 @@ const Index = () => {
     if (!token) return;
     setHistoryLoading(true);
     try {
-      const response = await fetch("/api/v1/history", {
+      const response = await fetch(apiUrl("/api/v1/history"), {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!response.ok) {
@@ -138,7 +141,7 @@ const Index = () => {
       if (!token) return;
       setChatLoading(true);
       try {
-        const response = await fetch(`/api/v1/chat/history/${cheatsheetId}`, {
+        const response = await fetch(apiUrl(`/api/v1/chat/history/${cheatsheetId}`), {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!response.ok) {
@@ -182,7 +185,7 @@ const Index = () => {
       setActiveHistoryId(id);
       setIsGenerated(false);
       try {
-        const response = await fetch(`/api/v1/cheatsheet/${id}`, {
+        const response = await fetch(apiUrl(`/api/v1/cheatsheet/${id}`), {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!response.ok) {
@@ -227,7 +230,7 @@ const Index = () => {
       const token = getAuthToken();
       if (!token) return;
       try {
-        const response = await fetch(`/api/v1/cheatsheet/${id}`, {
+        const response = await fetch(apiUrl(`/api/v1/cheatsheet/${id}`), {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -257,6 +260,7 @@ const Index = () => {
     setFlashcardsData([]);
     setIsGenerated(false);
     setViewMode("cheatsheet");
+
     scrollToUpload();
   }, [scrollToUpload]);
 
@@ -282,7 +286,7 @@ const Index = () => {
       formData.append("flashcard_count", String(options.flashcardCount));
 
       const token = getAuthToken();
-      const response = await fetch("/api/v1/rag/cheatsheet", {
+      const response = await fetch(apiUrl("/api/v1/rag/cheatsheet"), {
         method: "POST",
         headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         body: formData,
@@ -356,7 +360,7 @@ const Index = () => {
       setChatMessages((prev) => [...prev, userMessage]);
       setChatLoading(true);
       try {
-        const response = await fetch("/api/v1/chat/ask", {
+        const response = await fetch(apiUrl("/api/v1/chat/ask"), {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -397,7 +401,7 @@ const Index = () => {
     if (!token || !activeHistoryId) return;
     setChatLoading(true);
     try {
-      const response = await fetch(`/api/v1/chat/clear/${activeHistoryId}`, {
+      const response = await fetch(apiUrl(`/api/v1/chat/clear/${activeHistoryId}`), {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
