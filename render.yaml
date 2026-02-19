@@ -7,5 +7,26 @@ services:
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port 10000
     envVars:
-      - key: GROQ_API_KEY
+      - key: GROQ_API_KEY_CHEATSHEET
+        sync: false
+      - key: GROQ_API_KEY_CHAT
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: ALLOW_DEV_AUTH
+        value: "false"
+
+  - type: web
+    name: quicksheet-ai-frontend
+    env: static
+    plan: free
+    region: oregon
+    buildCommand: npm install; npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_BASE
         sync: false
