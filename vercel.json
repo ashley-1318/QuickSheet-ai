@@ -8,13 +8,14 @@
       }
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "handle": "filesystem"
+      "source": "/api/v1/(.*)",
+      "destination": "https://quicksheet-ai-backend-production-1e14.up.railway.app/api/v1/$1"
     },
     {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
