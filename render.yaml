@@ -18,12 +18,3 @@ services:
         sync: false
       - key: ALLOW_DEV_AUTH
         value: "false"
-
-  - type: static_site
-    name: quicksheet-ai-frontend
-    env: static
-    buildCommand: npm install; npm run build
-    staticPublishPath: dist
-    envVars:
-      - key: VITE_API_BASE
-        sync: false
