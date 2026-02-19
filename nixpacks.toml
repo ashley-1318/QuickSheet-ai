@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["python3", "nodejs", "poppler_utils", "tesseract"]
+nixPkgs = ["python311", "python311Packages.pip", "nodejs", "poppler_utils", "tesseract"]
 
 [phases.install]
 cmds = ["npm ci", "python3 -m pip install -r requirements.txt"]
