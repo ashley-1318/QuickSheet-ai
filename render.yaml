@@ -2,7 +2,6 @@ services:
   - type: web
     name: quicksheet-ai-backend
     env: python
-    plan: starter
     region: oregon
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port 10000
@@ -20,10 +19,9 @@ services:
       - key: ALLOW_DEV_AUTH
         value: "false"
 
-  - type: static
+  - type: static_site
     name: quicksheet-ai-frontend
     env: static
-    plan: starter
     buildCommand: npm install; npm run build
     staticPublishPath: dist
     envVars:
