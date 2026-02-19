@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     rag_chunk_overlap: int = 75  # Reduced from 150
     rag_top_k: int = 3  # Reduced from 5
     rag_max_files: int = 4
-    rag_embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
+    rag_embedding_model: str = "sentence-transformers/paraphrase-MiniLM-L3-v2"
     
     # Fast mode parameters
     fast_mode_chunk_size: int = 400
