@@ -218,62 +218,31 @@ def _fetch_cheatsheet(cheatsheet_id: str, user_id: str) -> dict | None:
 
 
 def _serialize_structured_json(data: dict[str, Any]) -> str:
-    """Serialize cheatsheet data into semantically rich text for FAISS indexing.
+    """Serialize cheatsheet data into text for RAG."""
+    parts = []
     
-    Focus on extracting actual content from the structured data, avoiding
-    excessive markup that would dilute semantic similarity.
-    """
-    parts: list[str] = []
-    
-    # These are the actual content fields from RagResponse
-    content_fields = {
-        "title": 3,  # weight - appears 3 times
-        "one_line_summary": 3,
-        "definitions": 2,
-        "core_formulas": 2,
-        "key_concepts": 2,
-        "diagrams": 1,
-        "comparison_table": 1,
-        "important_metrics": 1,
-        "mistakes_to_avoid": 1,
-    }
-    
-    for field, weight in content_fields.items():
-        value = data.get(field)
-        if not value:
-            continue
+    # Priority fields
+    if title := data.get("title"):
+        parts.append(f"Title: {title}")
+    if summary := data.get("one_line_summary"):
+        parts.append(f"Summary: {summary}")
         
-        # Add field as context (helps with semantic search)
-        for _ in range(weight):
-            if isinstance(value, str):
-                if value.strip():
-                    parts.append(value)
-            elif isinstance(value, list):
-                for item in value:
-                    if isinstance(item, str) and item.strip():
-                        parts.append(item)
-                    elif isinstance(item, dict):
-                        for k, v in item.items():
-                            if isinstance(v, str) and v.strip():
-                                parts.append(f"{k}: {v}")
-    
-    # Add flashcards if present
-    flashcards = data.get("flashcards", [])
-    if flashcards:
-        for fc in flashcards:
-            if isinstance(fc, dict):
-                q = fc.get("question") or fc.get("prompt")
-                a = fc.get("answer")
-                if q and isinstance(q, str):
-                    parts.append(q)
-                if a and isinstance(a, str):
-                    parts.append(a)
-    
-    serialized = "\n\n".join(parts)
-    logger.info("Serialized context: %d characters, %d lines", len(serialized), len(parts))
-    if serialized and logger.isEnabledFor(logging.DEBUG):
-        logger.debug("Content sample:\n%s", serialized[:500])
-    return serialized
+    # List fields
+    for field in ["definitions", "core_formulas", "key_concepts", "important_metrics", "mistakes_to_avoid"]:
+        if items := data.get(field):
+            if isinstance(items, list):
+                parts.extend([str(item) for item in items if item])
+                
+    # Flashcards
+    if flashcards := data.get("flashcards"):
+        for card in flashcards:
+            if isinstance(card, dict):
+                q = card.get("question", "")
+                a = card.get("answer", "")
+                if q or a:
+                    parts.append(f"Q: {q}\nA: {a}")
+                    
+    return "\n\n".join(parts)
 
 
 def _save_chat_messages(user_id: str, cheatsheet_id: str, question: str, answer: str) -> None:
