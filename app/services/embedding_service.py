@@ -29,6 +29,8 @@ class EmbeddingService:
             self._embeddings = HuggingFaceEmbeddings(
                 model_name=settings.rag_embedding_model,
                 encode_kwargs={"normalize_embeddings": True},
+                model_kwargs={"device": "cpu"},
+                cache_folder="/tmp/embeddings_cache",
             )
             logger.info("Embeddings initialized successfully (singleton)")
             self._initialized = True
