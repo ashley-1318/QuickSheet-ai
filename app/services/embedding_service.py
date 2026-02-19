@@ -1,5 +1,5 @@
 import logging
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 
 from app.config import settings
 
@@ -25,12 +25,11 @@ class EmbeddingService:
             return
         
         try:
-            logger.info(f"Initializing embeddings with model: {settings.rag_embedding_model}")
+            logger.info(f"Initializing embeddings with model: {settings.rag_embedding_model}")ok doc
             self._embeddings = HuggingFaceEmbeddings(
                 model_name=settings.rag_embedding_model,
                 encode_kwargs={"normalize_embeddings": True},
                 model_kwargs={"device": "cpu"},
-                cache_folder="/tmp/embeddings_cache",
             )
             logger.info("Embeddings initialized successfully (singleton)")
             self._initialized = True

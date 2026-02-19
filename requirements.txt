@@ -21,3 +21,4 @@ sentence-transformers==3.0.1
 python-multipart==0.0.9
 supabase==2.6.0
 google-auth==2.35.0
+langchain-huggingface==0.0.3

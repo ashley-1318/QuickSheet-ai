@@ -31,3 +31,8 @@ app.include_router(history_router)
 @app.get("/health")
 def health_check() -> dict:
     return {"status": "ok"}
+
+
+@app.get("/")
+def read_root() -> dict:
+    return {"message": "Welcome to QuickSheet AI API"}

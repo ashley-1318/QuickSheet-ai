@@ -17,6 +17,11 @@ COPY requirements.txt .
 # Install python dependencies without caching to save space
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Pre-download the embedding model to cache it in the image
+COPY app/utils/download_model.py app/utils/
+ENV SENTENCE_TRANSFORMERS_HOME=/app/models_cache
+RUN python app/utils/download_model.py
+
 # Copy the rest of the application
 COPY . .
 
