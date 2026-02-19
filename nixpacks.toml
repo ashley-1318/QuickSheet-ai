@@ -9,7 +9,7 @@ cmds = [
 ]
 
 [phases.build]
-cmds = []  # Clear default build commands to prevent automatic "pip install"
+cmds = ["echo 'Skipping default build'"]
 
 [start]
 cmd = ". .venv/bin/activate && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
