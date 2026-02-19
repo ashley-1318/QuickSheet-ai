@@ -75,7 +75,7 @@ class RagPipeline:
 
         clamped_count = max(5, min(10, flashcard_count))
         flashcard_instruction = (
-            "- flashcards: array of {{question, answer}}\n"
+            "- flashcards: array of objects with keys 'question' and 'answer'\n"
             f"- generate {clamped_count} flashcards\n"
             if flashcards
             else ""
@@ -143,17 +143,28 @@ class RagPipeline:
             raw_response=None,
             processing_time_ms=int(extraction_time + embedding_time + retrieval_time + llm_time),
         )
-        if flashcards and not response.flashcards:
-            response.flashcards = _fallback_flashcards(
-                response.definitions,
-                response.key_concepts,
-                max_count=clamped_count,
-            )
-        if flashcards and _flashcards_need_answers(response.flashcards):
-            regenerated = await _generate_flashcards_with_llm(context, clamped_count)
-            if regenerated:
-                response.flashcards = regenerated
-            response.flashcards = _ensure_flashcard_answers(response.flashcards)
+        try:
+            from app.schemas.rag import Flashcard
+
+            if flashcards and not response.flashcards:
+                fallback = _fallback_flashcards(
+                    response.definitions,
+                    response.key_concepts,
+                    max_count=clamped_count,
+                )
+                response.flashcards = [Flashcard(**item) for item in fallback]
+
+            if flashcards and _flashcards_need_answers(response.flashcards):
+                regenerated = await _generate_flashcards_with_llm(context, clamped_count)
+                if regenerated:
+                    response.flashcards = [Flashcard(**item) for item in regenerated]
+                
+                updated = _ensure_flashcard_answers(response.flashcards)
+                response.flashcards = [Flashcard(**item) for item in updated]
+        except Exception as exc:
+            logger.error("Flashcard processing warning: %s", _safe_for_log(str(exc)))
+            # Do not fail the whole request; proceed with whatever flashcards we have (or empty)
+
         response.compressed_words = _count_words_from_sections(response)
         return response
 

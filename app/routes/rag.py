@@ -13,8 +13,8 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1")
 
 
-def _save_cheatsheet_to_db(user_id: str, result: RagResponse) -> None:
-    """Background task to save cheatsheet to database."""
+def _save_cheatsheet_to_db(user_id: str, result: RagResponse) -> str | None:
+    """Save cheatsheet to database and return ID."""
     try:
         insert_result = (
             supabase.table("cheatsheets")
@@ -31,8 +31,10 @@ def _save_cheatsheet_to_db(user_id: str, result: RagResponse) -> None:
         if insert_result.data:
             cheatsheet_id = insert_result.data[0].get("id")
             logger.info(f"Cheatsheet saved with ID: {cheatsheet_id}")
+            return cheatsheet_id
     except Exception as exc:
-        logger.error("Background DB save failed: %s", _safe_for_log(str(exc)))
+        logger.error("DB save failed: %s", _safe_for_log(str(exc)))
+    return None
 
 
 @router.post("/rag/cheatsheet", response_model=RagResponse)
@@ -45,7 +47,6 @@ async def generate_cheatsheet(
     flashcards: bool = Form(True),
     flashcard_count: int = Form(8),
     fast_mode: bool = Form(False),
-    background_tasks: BackgroundTasks = BackgroundTasks(),
     user_id: str = Depends(get_current_user_id),
 ) -> RagResponse:
     try:
@@ -68,8 +69,10 @@ async def generate_cheatsheet(
             fast_mode=fast_mode,
         )
         
-        # Save to DB in background - return immediately
-        background_tasks.add_task(_save_cheatsheet_to_db, user_id, result)
+        # Save to DB synchronously to get ID for chat
+        cheatsheet_id = _save_cheatsheet_to_db(user_id, result)
+        if cheatsheet_id:
+            result.cheatsheet_id = cheatsheet_id
         
         logger.debug(
             "Result - title: %s, definitions: %s, key_concepts: %s",
@@ -80,10 +83,15 @@ async def generate_cheatsheet(
         return result
     except ValueError as exc:
         logger.error("ValueError: %s", _safe_for_log(str(exc)))
+        import traceback
+        logger.error(traceback.format_exc())
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as exc:
-        logger.error("Unexpected error: %s", _safe_for_log(str(exc)))
-        raise HTTPException(status_code=500, detail=str(exc)) from exc
+        import traceback
+        error_trace = traceback.format_exc()
+        logger.error("Unexpected error: %s\n%s", _safe_for_log(str(exc)), error_trace)
+        # Return the actual error message to help debugging
+        raise HTTPException(status_code=500, detail=f"Generation failed: {str(exc)}") from exc
 
 
 def _safe_for_log(text: str) -> str:
