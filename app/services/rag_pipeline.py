@@ -82,26 +82,21 @@ class RagPipeline:
         )
 
         # Optimized shorter prompt
-        prompt = ChatPromptTemplate.from_messages(
-            [
-                (
-                    "system",
-                    "Generate structured exam-ready cheat sheet strictly from provided context. "
-                    "Return ONLY valid JSON with: title, one_line_summary, definitions, core_formulas, key_concepts. "
-                    f"Include only non-empty fields. {flashcard_instruction}",
-                ),
-                (
-                    "user",
-                    "Context:\n{context}\n\nGenerate cheat sheet.",
-                ),
-            ]
+        # Optimized shorter prompt
+        system_prompt = (
+            "Generate structured exam-ready cheat sheet strictly from provided context. "
+            "Return ONLY valid JSON with: title, one_line_summary, definitions, core_formulas, key_concepts. "
+            f"Include only non-empty fields. {flashcard_instruction}"
         )
+        user_prompt = f"Context:\n{context}\n\nGenerate cheat sheet."
 
         llm_start = time.time()
+        # Direct invocation to avoid LangChain prompt template parsing issues with braces
         response = self._llm.invoke(
-            prompt.format_messages(
-                context=context,
-            )
+            [
+                ("system", system_prompt),
+                ("user", user_prompt),
+            ]
         )
         llm_time = (time.time() - llm_start) * 1000
         
